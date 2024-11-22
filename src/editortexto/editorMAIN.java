@@ -54,6 +54,8 @@ public class editorMAIN extends JFrame {
         this.setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
+        archivoAbierto = null; 
+        editor = new Editor("nuevoArchivo");
      
         JPanel toolbarPrincipal = new JPanel();
         toolbarPrincipal.setLayout(new FlowLayout(FlowLayout.LEFT));
