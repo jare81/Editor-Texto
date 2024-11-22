@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,6 +18,8 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -38,6 +41,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.text.rtf.RTFEditorKit;
 
 /**
  *
@@ -69,18 +73,15 @@ public class editorMAIN extends JFrame {
         toolbarPrincipal.add(nuevo);
         toolbarPrincipal.add(abrir);
         toolbarPrincipal.add(guardar);
-
+        
         
         JPanel toolbarFuenteTamano = new JPanel();
         toolbarFuenteTamano.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-    
-        String[] fuentes = {"Arial", "Verdana", "Tahoma", "Courier New", "Times New Roman"};
-        JComboBox<String> comboFuentes = new JComboBox<>(fuentes);
+        JComboBox<String> comboFuentes = new JComboBox<>(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
         Integer[] tamanos = {8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36};
         JComboBox<Integer> comboTamanos = new JComboBox<>(tamanos);
 
-      
         JButton fuenteButton = new JButton("Fuente");
         JButton tamanoButton = new JButton("Tamaño");
 
@@ -182,7 +183,7 @@ public class editorMAIN extends JFrame {
         });
     }
 
-    private void abrirArchivo(String nombreArchivo) {
+    /*private void abrirArchivo(String nombreArchivo) {
         
         String rutaCarpeta = "Documentos";
         File carpeta = new File(rutaCarpeta);
@@ -213,17 +214,49 @@ public class editorMAIN extends JFrame {
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Error al leer el archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }*/
+    
+    private void abrirArchivo(String nombreArchivo) {
+    String rutaCarpeta = "Documentos";
+    File carpeta = new File(rutaCarpeta);
+    textPane.setText("");
+    if (!carpeta.exists()) {
+        JOptionPane.showMessageDialog(this, "La carpeta 'Documentos' no existe.");
+        return;
     }
+
+    File archivo = new File(carpeta, nombreArchivo + ".rtf");
+    archivoAbierto = archivo;
+
+    if (!archivo.exists()) {
+        JOptionPane.showMessageDialog(this, "El archivo no se encuentra en la carpeta 'Documentos'.");
+        return;
+    } else {
+        JOptionPane.showMessageDialog(this, "Archivo abierto con éxito.");
+    }
+
+    archivoAbierto = archivo;
+
+    try (FileInputStream fis = new FileInputStream(archivo)) {
+        RTFEditorKit rtfEditorKit = new RTFEditorKit();
+        textPane.setDocument(rtfEditorKit.createDefaultDocument());
+        rtfEditorKit.read(fis, textPane.getDocument(), 0);
+    } catch (IOException | javax.swing.text.BadLocationException ex) {
+        JOptionPane.showMessageDialog(this, "Error al leer el archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
 
     private void crearArchivoDocx(String nombreArchivo) {
         String rutaCarpeta = "Documentos";
         File carpeta = new File(rutaCarpeta);
+        textPane.setText("");
 
         if (!carpeta.exists()) {
             carpeta.mkdirs();
         }
 
         File archivo = new File(carpeta, nombreArchivo + ".rtf");
+        archivoAbierto= archivo;
         try (FileWriter writer = new FileWriter(archivo)) {
             writer.write("");
             JOptionPane.showMessageDialog(this, "Archivo creado exitosamente: " + archivo.getAbsolutePath());
@@ -238,7 +271,7 @@ public class editorMAIN extends JFrame {
         }
     }
 
-    public void guardarCambios(JTextPane textPane) {
+    /*public void guardarCambios(JTextPane textPane) {
         try {
             if (archivoAbierto != null) {
                 escribirArchivo(archivoAbierto, textPane.getText());
@@ -253,7 +286,30 @@ public class editorMAIN extends JFrame {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error al guardar el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }*/
+    
+    public void guardarCambios(JTextPane textPane) {
+    try {
+        RTFEditorKit rtfEditorKit = new RTFEditorKit(); // Usar para manejar RTF
+        if (archivoAbierto != null) {
+            try (FileOutputStream fos = new FileOutputStream(archivoAbierto)) {
+                rtfEditorKit.write(fos, textPane.getDocument(), 0, textPane.getDocument().getLength());
+                JOptionPane.showMessageDialog(this, "Archivo guardado con exito " );
+            }
+        } else {
+            JFileChooser fileChooser = new JFileChooser();
+            int option = fileChooser.showSaveDialog(this);
+            if (option == JFileChooser.APPROVE_OPTION) {
+                archivoAbierto = fileChooser.getSelectedFile();
+                try (FileOutputStream fos = new FileOutputStream(archivoAbierto)) {
+                    rtfEditorKit.write(fos, textPane.getDocument(), 0, textPane.getDocument().getLength());
+                }
+            }
+        }
+    } catch (IOException | BadLocationException e) {
+        JOptionPane.showMessageDialog(this, "Error al guardar el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
 
     public static void main(String[] args) {
         editorMAIN ventana = new editorMAIN();
