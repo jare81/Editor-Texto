@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package editortexto;
-
+import editortexto.Editor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -43,12 +43,12 @@ import javax.swing.text.StyledDocument;
  *
  * @author Dell
  */
-public class editorMAIN1 extends JFrame {
+public class editorMAIN extends JFrame {
     private JTextPane textPane;
     private File archivoAbierto = null;
     private Editor editor;
 
-    public editorMAIN1() {
+    public editorMAIN() {
         setSize(800, 500);
         setTitle("Editor de Texto");
         this.setLocationRelativeTo(null);
@@ -138,7 +138,7 @@ public class editorMAIN1 extends JFrame {
 
         
         guardar.addActionListener(e -> {
-            guardarCambios( textPane);
+            guardarCambios(textPane);
         });
 
        
@@ -181,6 +181,7 @@ public class editorMAIN1 extends JFrame {
     }
 
     private void abrirArchivo(String nombreArchivo) {
+        
         String rutaCarpeta = "Documentos";
         File carpeta = new File(rutaCarpeta);
 
@@ -247,14 +248,13 @@ public class editorMAIN1 extends JFrame {
                     escribirArchivo(archivoAbierto, textPane.getText());
                 }
             }
-            textPane.setText("");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error al guardar el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public static void main(String[] args) {
-        editorMAIN1 ventana = new editorMAIN1();
+        editorMAIN ventana = new editorMAIN();
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setVisible(true);
     }

@@ -25,11 +25,11 @@ public class Editor {
 
     private File myFile = null;
     private JTextPane textPane;
-    private RTFEditorKit rtfEditorKit = new RTFEditorKit(); // Para manejar archivos RTF
+    private RTFEditorKit rtfEditorKit = new RTFEditorKit(); 
 
     public Editor(String nombreArchivo) {
         if (!nombreArchivo.endsWith(".rtf")) {
-            nombreArchivo += ".rtf"; // Agregar la extensión predeterminada
+            nombreArchivo += ".rtf"; 
         }
         myFile = new File(nombreArchivo);
     }
@@ -136,7 +136,7 @@ public void changeColor(Color color) {
 
     public void abrirFile() {
         try (FileReader reader = new FileReader(myFile)) {
-            textPane.setText(""); // Limpiar el texto actual
+            textPane.setText(""); 
             rtfEditorKit.read(reader, textPane.getDocument(), 0);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error al abrir el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
